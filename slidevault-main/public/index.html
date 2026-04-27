@@ -1,0 +1,228 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SlideVault — Upload. Discover. Present.</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    <div class="logo-mark">SV</div>
+    SlideVault
+  </div>
+  <div class="nav-links">
+    <button class="nav-btn active" onclick="showPage('home')">Browse</button>
+    <button class="nav-btn" onclick="showPage('categories')">Categories</button>
+    <button class="nav-btn" onclick="showPage('upload')">Upload</button>
+  </div>
+  <button class="nav-cta" onclick="showPage('upload')">↑ Upload Slides</button>
+</nav>
+
+<!-- ══════════════ HOME PAGE ══════════════ -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="hero-grid-bg"></div>
+    <div class="container">
+      <div class="hero-inner">
+        <div class="hero-eyebrow">
+          <div class="hero-eyebrow-dot"></div>
+          Academic & Professional Slide Repository
+        </div>
+        <h1>Discover &amp; Share<br><em>Great Presentations</em></h1>
+        <p>Upload, preview, and download presentation slides across every subject area.
+           Built for students, educators, and professionals.</p>
+        <div class="hero-actions">
+          <button class="btn-primary" onclick="showPage('upload')">↑ Upload Slides</button>
+          <button class="btn-outline" onclick="document.getElementById('browse-section').scrollIntoView({behavior:'smooth'})">Browse Library</button>
+        </div>
+        <div class="stats-strip">
+          <div class="stat-box"><span class="stat-num" id="stat-slides">0</span><span class="stat-label">Presentations</span></div>
+          <div class="stat-box"><span class="stat-num" id="stat-dl">0</span><span class="stat-label">Downloads</span></div>
+          <div class="stat-box"><span class="stat-num" id="stat-cats">8</span><span class="stat-label">Subjects</span></div>
+          <div class="stat-box"><span class="stat-num" id="stat-views">0</span><span class="stat-label">Previews</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container" id="browse-section">
+    <div class="section">
+      <!-- Trending -->
+      <div class="trending-bar">
+        <div class="trending-label">🔥 Trending Now</div>
+        <div class="trending-items" id="trending-items"></div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="search-wrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--muted);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="search-input" placeholder="Search by title, author, or topic..." oninput="renderCards()">
+        </div>
+        <select class="select-filter" id="sort-select" onchange="renderCards()">
+          <option value="recent">Most Recent</option>
+          <option value="popular">Most Downloaded</option>
+          <option value="views">Most Viewed</option>
+          <option value="liked">Most Liked</option>
+        </select>
+      </div>
+      <div class="cat-pills" id="cat-pills"></div>
+
+      <div class="sec-head">
+        <div class="sec-title">Presentations</div>
+        <div class="sec-count" id="result-count"></div>
+      </div>
+      <div class="slides-grid" id="slides-grid"></div>
+      <div class="empty" id="empty-state" style="display:none;">
+        <div class="empty-icon">📂</div>
+        <p>No presentations found. Try a different search or upload one!</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ CATEGORIES PAGE ══════════════ -->
+<div id="page-categories" class="page">
+  <div class="container">
+    <div class="section">
+      <div class="sec-head" style="margin-bottom:32px;">
+        <div class="sec-title">Subject Categories</div>
+      </div>
+      <div class="cat-page-grid" id="cat-page-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ UPLOAD PAGE ══════════════ -->
+<div id="page-upload" class="page">
+  <div class="upload-page">
+    <div class="upload-title">Upload Presentation</div>
+    <div class="upload-subtitle">Share your slides with students and with the professionals.</div>
+
+    <div class="upload-dropzone" id="dropzone" onclick="document.getElementById('file-input').click()">
+      <input type="file" id="file-input" class="drop-input" accept=".ppt,.pptx,.pdf,.key" onchange="handleFileSelect(this)">
+      <div class="drop-icon">📊</div>
+      <div class="drop-text">Drop your presentation here or <strong style="color:var(--accent)">browse files</strong></div>
+      <div class="drop-hint">Supports · .ppt · .pdf · .key — max 50MB</div>
+      <div class="file-chosen" id="file-chosen">
+        <span style="font-size:20px">📎</span>
+        <span class="file-chosen-name" id="file-name"></span>
+        <span class="file-chosen-size" id="file-size"></span>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group full">
+        <label class="form-label">Presentation Title *</label>
+        <input type="text" class="form-input" id="f-title" placeholder="e.g Introduction to Algorithms">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Your Name</label>
+        <input type="text" class="form-input" id="f-author" placeholder="Your Name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Institution / Affiliation</label>
+        <input type="text" class="form-input" id="f-institution" placeholder="Your Institution">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Subject Category</label>
+        <select class="form-select" id="f-category">
+          <option value="">Select category...</option>
+          <option value="cs">Computer Science</option>
+          <option value="math">Mathematics</option>
+          <option value="physics">Physics</option>
+          <option value="business">Business & Management</option>
+          <option value="biology">Biology & Life Sciences</option>
+          <option value="engineering">Engineering</option>
+          <option value="social">Social Sciences</option>
+          <option value="design">Design & Arts</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Access Level</label>
+        <select class="form-select" id="f-access">
+          <option value="free">Free Download</option>
+          <option value="preview">Preview Only</option>
+          <option value="request">Request Access</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Number of Slides</label>
+        <div class="slide-count-selector" id="slide-count-opts">
+          <span class="count-opt" data-v="5-10" onclick="selectCount(this)">5–10</span>
+          <span class="count-opt" data-v="11-20" onclick="selectCount(this)">11–20</span>
+          <span class="count-opt selected" data-v="21-35" onclick="selectCount(this)">21–35</span>
+          <span class="count-opt" data-v="36-50" onclick="selectCount(this)">36–50</span>
+          <span class="count-opt" data-v="50+" onclick="selectCount(this)">50+</span>
+        </div>
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Description *</label>
+        <textarea class="form-textarea" id="f-desc" placeholder="What topics does this presentation cover? Who is the intended audience?"></textarea>
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Tags (press Enter to add)</label>
+        <div style="background:white;border:1px solid var(--border);border-radius:10px;padding:8px 12px;transition:border-color 0.2s;" id="tags-container" onclick="document.getElementById('tag-input').focus()">
+          <div class="tags-input" id="tags-list">
+            <input type="text" id="tag-input" class="tag-add-input" placeholder="Add tag..." onkeydown="handleTagKey(event)">
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="form-submit" onclick="submitPresentation()">
+      <span>↑</span> Publish Presentation
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════ PREVIEW MODAL ══════════════ -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-top">
+      <div class="modal-title-block">
+        <div class="modal-title" id="m-title"></div>
+        <div class="modal-subtitle" id="m-subtitle"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+
+    <!-- Slide Viewer -->
+    <div class="slide-viewer">
+      <div class="slide-display" id="slide-display"></div>
+      <div class="slide-nav">
+        <button class="slide-nav-btn" id="btn-prev" onclick="prevSlide()">‹</button>
+        <div class="slide-counter" id="slide-counter"></div>
+        <button class="slide-nav-btn" id="btn-next" onclick="nextSlide()">›</button>
+      </div>
+      <div class="slide-dots" id="slide-dots"></div>
+    </div>
+
+    <div class="modal-bottom">
+      <div class="modal-meta-row" id="m-meta"></div>
+      <div class="modal-desc" id="m-desc"></div>
+      <div class="modal-actions">
+        <button class="btn-download" id="m-dl-btn" onclick="downloadSlide()">⬇ Download Slides</button>
+        <button class="btn-like" id="m-like-btn" onclick="toggleLike()">♡ Like</button>
+        <button class="btn-outline" onclick="closeModal()" style="padding:11px 20px;font-size:13px;">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span id="toast-icon">✅</span>
+  <span id="toast-msg">Done!</span>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
